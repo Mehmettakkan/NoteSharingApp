@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -28,13 +29,13 @@ public class Note {
     @Column(name = "content")
     private String content;
 
-    @NotNull(message = "Paylaşım tarihi boş bırakılamaz")
     @Column(name = "shared_date")
-    private Date sharedDate;
+    private LocalDateTime sharedDate = LocalDateTime.now();
 
     @NotNull(message = "Paylaşan kullanıcı boş bırakılamaz")
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE,
             CascadeType.PERSIST, CascadeType.REFRESH})
+
     @JoinColumn(name = "sharer_id")
     private Sharer sharer;
 
