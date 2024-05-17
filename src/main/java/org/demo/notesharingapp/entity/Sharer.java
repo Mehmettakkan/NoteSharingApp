@@ -1,10 +1,12 @@
 package org.demo.notesharingapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import java.util.List;
 
@@ -13,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "notes"})
 public class Sharer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,7 +48,7 @@ public class Sharer {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Pattern(regexp = "[0-9\\s]{12}", message = "Geçerli bir telefon numarası giriniz")
+    @Pattern(regexp = "0[1-9][0-9]{9}", message = "Geçerli bir telefon numarası giriniz")
     @NotNull(message = "Telefon numarası boş bırakılamaz")
     @Column(name = "phone")
     private String phone;
@@ -60,7 +63,7 @@ public class Sharer {
     @Column(name = "gender", nullable = false)
     private String gender;
 
-    @OneToMany(mappedBy = "sharer", fetch = FetchType.LAZY,
+    @OneToMany(mappedBy = "sharer", fetch = FetchType.EAGER,
             cascade = {CascadeType.DETACH, CascadeType.MERGE,
                     CascadeType.PERSIST, CascadeType.REFRESH})
     List<Note> notes;
