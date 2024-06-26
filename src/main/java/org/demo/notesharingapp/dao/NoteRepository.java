@@ -15,13 +15,13 @@ public interface NoteRepository extends JpaRepository<Note, Integer> {
 
     List<Note> findNoteByTitleEndingWithIgnoreCase(String title);
 
-    Note findNoteByTitleAndCourse_Id(String noteTitle, int courseId);
+    Note findNoteByTitleAndCourse_Id(String title, int courseId);
 
-    List<Note> findNoteByTitleOrCourse_Id(String noteTitle, int courseId);
-
-    List<Note> findNoteByCourse_CourseType(String courseType);
+    List<Note> findNoteByTitleOrCourse_Id(String title, int courseId);
 
     List<Note> findNoteBySharer_UserName(String userName);
 
-    List<Note> findNoteByTitleContains(String noteTitle);
+    List<Note> findNoteByTitleContains(String title);
+
+    List<Note> findByCourseId(int courseId);
 }
