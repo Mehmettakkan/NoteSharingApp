@@ -6,11 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/notes")
+@CrossOrigin
 public class NoteController {
     private final NoteService noteService;
 
@@ -20,9 +22,17 @@ public class NoteController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Note> saveNote(@RequestBody Note note) {
-        Note savedNote = noteService.saveNote(note);
-        return new ResponseEntity<>(savedNote, HttpStatus.CREATED);
+    public ResponseEntity<Note> saveNote(@RequestParam("file") MultipartFile file,
+                                         @RequestParam("title") String title,
+                                         @RequestParam("content") String content,
+                                         @RequestParam("sharerId") int sharerId,
+                                         @RequestParam("courseName") String courseName) {
+        Note note = new Note();
+        note.setTitle(title);
+        note.setContent(content);
+
+        Note savedNote = noteService.saveNote(file, note, sharerId, courseName);
+        return ResponseEntity.ok(savedNote);
     }
 
     @PutMapping("/update/{noteId}")
@@ -48,6 +58,5 @@ public class NoteController {
         Note note = noteService.getNoteById(noteId);
         return new ResponseEntity<>(note, HttpStatus.OK);
     }
-
 
 }
