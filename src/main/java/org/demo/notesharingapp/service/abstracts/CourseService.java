@@ -1,6 +1,7 @@
 package org.demo.notesharingapp.service.abstracts;
 
 import org.demo.notesharingapp.entity.Course;
+import org.demo.notesharingapp.entity.Note;
 
 import java.util.List;
 
@@ -9,16 +10,13 @@ public interface CourseService {
 
     Course updateCourse(Course course);
 
-    void deleteCourseById(Integer id);
+    void deleteCourseById(Integer courseId);
 
     List<Course> getAllCourses();
 
-    Course getCourseById(Integer id);
+    Course getCourseById(Integer courseId);
 
     Course getCourseByName(String courseName);
 
-    Course getCourseByType(String courseType);
-
-    List<Course> getCoursesByCourseTypeAndCourseName(String courseType, String courseName);
-
+    List<Note> getNotesByCourseId(int courseId);
 }

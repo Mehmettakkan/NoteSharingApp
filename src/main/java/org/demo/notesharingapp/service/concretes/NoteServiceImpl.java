@@ -1,36 +1,83 @@
 package org.demo.notesharingapp.service.concretes;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.demo.notesharingapp.dao.NoteRepository;
+import org.demo.notesharingapp.dao.SharerRepository;
+import org.demo.notesharingapp.dao.CourseRepository;
 import org.demo.notesharingapp.entity.Note;
+import org.demo.notesharingapp.entity.Course;
+import org.demo.notesharingapp.entity.Sharer;
 import org.demo.notesharingapp.service.abstracts.NoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 @Service
 public class NoteServiceImpl implements NoteService {
-    // This variable is defined as final, meaning it can only be assigned a value once.
-    // It means that it should not have a default value.
     private final NoteRepository noteRepository;
+    private final SharerRepository sharerRepository;
+    private final CourseRepository courseRepository;
+    private final Path fileStorageLocation;
 
     @Autowired
-    public NoteServiceImpl(NoteRepository noteRepository) {
+    public NoteServiceImpl(NoteRepository noteRepository, SharerRepository sharerRepository, CourseRepository courseRepository) {
         this.noteRepository = noteRepository;
-        // When we make the final, we need to assign it directly to a value and
-        // we assigned it to the constructor here.
+        this.sharerRepository = sharerRepository;
+        this.courseRepository = courseRepository;
+        this.fileStorageLocation = Paths.get("path/to/save").toAbsolutePath().normalize();
+
+        try {
+            Files.createDirectories(this.fileStorageLocation);
+        } catch (Exception ex) {
+            throw new RuntimeException("Dosya depolama dizini oluşturulamadı.", ex);
+        }
     }
 
     @Override
-    public Note saveNote(Note note) {
-
+    public Note saveNote(MultipartFile file, Note note, int sharerId, String courseName) {
         if (note == null) {
             throw new IllegalArgumentException("Not boş olamaz");
         }
 
         if (note.getTitle() == null || note.getContent() == null) {
-            throw new IllegalArgumentException("Notun başlığı, içeriği veya paylaşım tarihi eksik");
+            throw new IllegalArgumentException("Notun başlığı veya içeriği eksik");
         }
+
+        // Kullanıcıyı bulma
+        Sharer sharer = sharerRepository.findById(sharerId)
+                .orElseThrow(() -> new IllegalArgumentException("Geçersiz kullanıcı kimliği: " + sharerId));
+
+        // Kursu isme göre bul veya yeni kurs oluştur
+        Course course = courseRepository.findByCourseName(courseName);
+        if (course == null) {
+            course = new Course();
+            course.setCourseName(courseName);
+            course = courseRepository.save(course);
+        }
+
+        // Dosyayı dosya sistemine kaydetme
+        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        Path targetLocation = this.fileStorageLocation.resolve(fileName);
+        try {
+            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException("Dosya kaydedilirken hata oluştu: " + e.getMessage());
+        }
+
+        // Dosya bilgilerini Note entity'sine ekleme
+        note.setFileName(fileName);
+        note.setFileType(file.getContentType());
+        note.setFilePath(targetLocation.toString());
+        note.setCourse(course);
+        note.setSharer(sharer);
         return noteRepository.save(note);
     }
 
@@ -57,30 +104,36 @@ public class NoteServiceImpl implements NoteService {
     public void deleteNoteById(int noteId) {
         Note existingNote = noteRepository.
                 findById(noteId).orElseThrow(() -> new IllegalArgumentException("Şu kimlipe sahip not bulunamadı: " + noteId));
+        noteRepository.delete(existingNote);
     }
 
     @Override
     public List<Note> getAllNotes() {
-        return List.of();
+        return noteRepository.findAll();
     }
 
     @Override
-    public Note getNoteById(Integer id) {
-        return null;
+    public Note getNoteById(Integer noteId) {
+        return noteRepository.findById(noteId)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Şu kimliğe sahip not bulunamadı: " + noteId));
+
     }
 
     @Override
     public List<Note> getNotesByTitle(String title) {
-        return List.of();
+        List<Note> notes = noteRepository.findNoteByTitleContains(title);
+
+        if (notes.isEmpty()) {
+            throw new RuntimeException("Şu başlıktaki " + title + " notlar bulunamadı");
+        }
+
+        return notes;
     }
 
     @Override
     public Note getNoteByTitleAndCourse_id(String title, Integer courseId) {
-        return null;
+        return noteRepository.findNoteByTitleAndCourse_Id(title, courseId);
     }
 
-    @Override
-    public List<Note> getNoteByCourse_CourseType(String courseType, Integer courseId) {
-        return List.of();
-    }
 }

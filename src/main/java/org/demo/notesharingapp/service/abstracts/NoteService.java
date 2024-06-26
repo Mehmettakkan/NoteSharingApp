@@ -1,11 +1,12 @@
 package org.demo.notesharingapp.service.abstracts;
 
 import org.demo.notesharingapp.entity.Note;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface NoteService {
-    Note saveNote(Note note);
+    public Note saveNote(MultipartFile file, Note note, int sharerId, String courseName);
 
     Note updateNote(int noteId, Note updateNote);
 
@@ -13,12 +14,10 @@ public interface NoteService {
 
     List<Note> getAllNotes();
 
-    Note getNoteById(Integer id);
+    Note getNoteById(Integer noteId);
 
     List<Note> getNotesByTitle(String title);
 
     Note getNoteByTitleAndCourse_id(String title, Integer courseId);
-
-    List<Note> getNoteByCourse_CourseType(String courseType, Integer courseId);
 
 }
