@@ -11,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/sharers")
+@CrossOrigin
 public class SharerController {
 
     private final SharerService sharerService;
