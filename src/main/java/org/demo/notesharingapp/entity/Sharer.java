@@ -1,12 +1,12 @@
 package org.demo.notesharingapp.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "notes"})
+
 public class Sharer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,32 +23,27 @@ public class Sharer {
     private int id;
 
     @NotBlank(message = "Ad alanı boş bırakılamaz")
-    @NotNull(message = "Ad alanı boş bırakılamaz")
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
     @NotBlank(message = "Soyad alanı boş bırakılamaz")
-    @NotNull(message = "Soyad alanı boş bırakılamaz")
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
     @NotBlank(message = "Kullanıcı adı boş bırakılamaz")
-    @NotNull(message = "Kullanıcı adı boş bırakılamaz")
     @Column(name = "user_name", nullable = false, unique = true)
     private String userName;
 
     @Email(message = "Geçerli bir e-posta adresi giriniz")
     @NotBlank(message = "E-posta adresi boş bırakılamaz")
-    @NotNull(message = "E-posta adresi boş bırakılamaz")
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @NotBlank(message = "Şifre boş bırakılamaz")
-    @NotNull(message = "Şifre boş bırakılamaz")
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Pattern(regexp = "0[1-9][0-9]{9}", message = "Geçerli bir telefon numarası giriniz")
+    @Pattern(regexp = "^\\d{10}$", message = "Geçerli bir telefon numarası giriniz")
     @NotNull(message = "Telefon numarası boş bırakılamaz")
     @Column(name = "phone")
     private String phone;
@@ -59,12 +54,13 @@ public class Sharer {
     private int age;
 
     @NotBlank(message = "Cinsiyet alanı boş bırakılamaz")
-    @NotNull(message = "Cinsiyet alanı boş bırakılamaz")
     @Column(name = "gender", nullable = false)
     private String gender;
 
-    @OneToMany(mappedBy = "sharer", fetch = FetchType.EAGER,
+    @OneToMany(mappedBy = "sharer", fetch = FetchType.LAZY,
             cascade = {CascadeType.DETACH, CascadeType.MERGE,
                     CascadeType.PERSIST, CascadeType.REFRESH})
-    List<Note> notes;
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "sharer"})
+    @ToString.Exclude
+    private List<Note> notes;
 }
