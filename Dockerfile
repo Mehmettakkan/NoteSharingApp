@@ -21,9 +21,6 @@ WORKDIR /app
 # Copy the build artifact from the build stage
 COPY --from=build /app/target/NoteSharingApp-0.0.1-SNAPSHOT.jar /app/NoteSharingApp.jar
 
-# Copy the .env file
-COPY .env .
-
 # Copy the entrypoint script
 COPY entrypoint.sh .
 
