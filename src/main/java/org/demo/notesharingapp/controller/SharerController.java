@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -21,9 +22,19 @@ public class SharerController {
         this.sharerService = sharerService;
     }
 
-    @PostMapping("/create")
+    /*@PostMapping("/create")
     public ResponseEntity<Sharer> saveSharer(@RequestBody Sharer sharer) {
         Sharer savedSharer = sharerService.saveSharer(sharer);
+        return new ResponseEntity<>(savedSharer, HttpStatus.CREATED);
+    }*/
+
+    @PostMapping("/create")
+    public ResponseEntity<Sharer> create(@RequestParam("file") MultipartFile file,
+                                         @RequestParam("sharer") Sharer sharer) {
+
+        Sharer savedSharer = sharerService.saveSharer(sharer);
+
+
         return new ResponseEntity<>(savedSharer, HttpStatus.CREATED);
     }
 
