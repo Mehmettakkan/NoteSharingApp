@@ -32,7 +32,7 @@ public class NoteController {
         note.setContent(content);
 
         Note savedNote = noteService.saveNote(file, note, sharerId, courseName);
-        return ResponseEntity.ok(savedNote);
+        return new ResponseEntity<>(savedNote, HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{noteId}")
