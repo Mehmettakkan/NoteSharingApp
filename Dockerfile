@@ -9,9 +9,6 @@ WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 
-# Copy the .env file to the build context
-COPY .env .
-
 # Build the application
 RUN mvn clean package -DskipTests
 
@@ -27,12 +24,14 @@ COPY --from=build /app/target/NoteSharingApp-0.0.1-SNAPSHOT.jar /app/NoteSharing
 # Copy the .env file
 COPY .env .
 
-# Export environment variables from .env file
-RUN export $(cat .env | xargs)
+# Copy the entrypoint script
+COPY entrypoint.sh .
+
+# Make the entrypoint script executable
+RUN chmod +x entrypoint.sh
 
 # Expose the port the application runs on
 EXPOSE 8080
 
 # Run the application
-ENTRYPOINT ["java", "-jar", "/app/NoteSharingApp.jar"]
-
+ENTRYPOINT ["./entrypoint.sh"]
