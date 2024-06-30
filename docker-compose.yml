@@ -5,7 +5,9 @@ services:
     build: .
     ports:
       - "8080:8080"
+    env_file:
+      - .env
     environment:
-      DB_URL: jdbc:mysql://db-mysql-note-sharing-do-user-17066697-0.c.db.ondigitalocean.com:25060/defaultdb
-      DB_USERNAME: doadmin
-      DB_PASSWORD: AVNS_tdjUWzpWRbQ7dnu9xN3
+      - DB_URL=${DB_URL}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
