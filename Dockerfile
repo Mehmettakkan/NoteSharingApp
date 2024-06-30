@@ -1,6 +1,6 @@
-# Use the official Maven image to create a build artifact.
+# Use the official Maven image with Java 17 to create a build artifact.
 # Use a multi-stage build to reduce the final image size.
-FROM maven:3.8.4-openjdk-11-slim AS build
+FROM maven:3.8.4-openjdk-17-slim AS build
 
 # Set the working directory in the container
 WORKDIR /app
@@ -13,7 +13,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Use a smaller base image for the final artifact
-FROM openjdk:11-jre-slim
+FROM openjdk:17-jre-slim
 
 # Set the working directory in the container
 WORKDIR /app
