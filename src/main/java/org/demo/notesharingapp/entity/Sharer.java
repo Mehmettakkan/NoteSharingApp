@@ -57,6 +57,15 @@ public class Sharer {
     @Column(name = "gender", nullable = false)
     private String gender;
 
+    @Column(name = "file_name")
+    private String fileName;
+
+    @Column(name = "file_type")
+    private String fileType;
+
+    @Column(name = "file_path")
+    private String filePath;
+
     @OneToMany(mappedBy = "sharer", fetch = FetchType.LAZY,
             cascade = {CascadeType.DETACH, CascadeType.MERGE,
                     CascadeType.PERSIST, CascadeType.REFRESH})
